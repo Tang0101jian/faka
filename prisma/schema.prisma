@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Card {
+  id           String      @id @default(cuid())
+  code         String      @unique
+  contentType  ContentType
+  contentValue String
+  fileName     String?
+  maxUses      Int         @default(1)
+  usedCount    Int         @default(0)
+  expiresAt    DateTime?
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  logs         RedeemLog[]
+}
+
+model RedeemLog {
+  id         String   @id @default(cuid())
+  cardId     String
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+enum ContentType {
+  TEXT
+  FILE
+}
